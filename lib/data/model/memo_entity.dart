@@ -4,9 +4,9 @@ import 'package:floor/floor.dart';
 class Memo {
   @PrimaryKey(autoGenerate: true)
   final int? id;
-  final String desc;
-  final int date;
-  final int color;
+  String desc;
+  int date;
+  int color;
 
   Memo({ this.id,
     required this.desc,

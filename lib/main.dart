@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: TextTheme(
           displayMedium: TextStyle(
+            color: Colors.red,
             fontSize: 22,
             fontFamily: GoogleFonts.jua().fontFamily,
           ),

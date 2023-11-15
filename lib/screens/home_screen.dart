@@ -5,6 +5,7 @@ import 'package:todolist_flutter/common/Constants.dart';
 import 'package:todolist_flutter/data/db/memo_database.dart';
 import 'package:todolist_flutter/data/model/memo_dao.dart';
 import 'package:todolist_flutter/data/model/memo_entity.dart';
+import 'package:todolist_flutter/screens/detail_screen.dart';
 import 'package:todolist_flutter/widget/memo_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,21 +25,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future initFloor() async {
-    final database =
-        await $FloorMemoDatabase.databaseBuilder(Constants.databaseName).build();
+    final database = await $FloorMemoDatabase
+        .databaseBuilder(Constants.databaseName)
+        .build();
     memoDao = database.memoDao;
     memoList = await memoDao.getAllMemos();
     setState(() {});
   }
 
-  addItem() async {
-    await memoDao.insertMemo(
-      Memo(
-          desc: "Hello",
-          date: DateTime.now().millisecondsSinceEpoch,
-          color: 0xffb2d5d4),
+  addItem() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailScreen(memoDao: memoDao, id: -1),
+      ),
     );
-    setState(() {});
   }
 
   @override
@@ -50,10 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: Colors.red,
         centerTitle: false,
         elevation: 1,
-        title: Text(
-          '메모장',
-          style: Theme.of(context).textTheme.displayMedium
-        ),
+        title: Text('메모장', style: Theme.of(context).textTheme.displayMedium),
         actions: [
           IconButton(
             onPressed: addItem,
@@ -72,8 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView.builder(
                 itemBuilder: (context, index) {
                   final memo = memoList[index];
-                  return MemoWidget(memo: memo,);
-                }, itemCount: memoList.length),
+                  return MemoWidget(
+                    memoDao: memoDao,
+                    memo: memo,
+                  );
+                },
+                itemCount: memoList.length),
           )),
     );
   }

@@ -6,33 +6,31 @@ import 'package:todolist_flutter/data/model/memo_entity.dart';
 import '../common/Constants.dart';
 
 class DetailScreen extends StatefulWidget {
-  int id = 0;
+  MemoDao memoDao;
+  int id = -1;
 
-  DetailScreen({super.key, required this.id});
+  DetailScreen({super.key, required this.memoDao, required this.id});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  late MemoDao memoDao;
   late Memo memo;
+
+  bool doneSave = false;
 
   @override
   void initState() {
     super.initState();
-    initFloor();
+    //TODO id = -1인 경우는 신규 입력으로 판단하여 floor에서 데이터를 가져오지 말것
+    print("DetailScreen initState");
   }
 
-  Future initFloor() async {
-    final database = await $FloorMemoDatabase
-        .databaseBuilder(Constants.databaseName)
-        .build();
-    memoDao = database.memoDao;
-  }
-
-  saveMemo(Memo memo) async {
-    await memoDao.insertMemo(memo);
+  saveMemo() async {
+    memo.date = DateTime.now().millisecondsSinceEpoch;
+    await widget.memoDao.insertMemo(memo);
+    Navigator.pop(context);
   }
 
   @override
@@ -49,11 +47,42 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
         actions: [
           GestureDetector(
-            onTap: () {},
-            child: Text(
-              '저장',
-              style: Theme.of(context).textTheme.displayMedium,
+            onTap: saveMemo,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 20,
+              ),
+              child: Center(
+                child: Text(
+                  '저장',
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+              ),
             ),
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          StreamBuilder(
+            
+            stream: widget.memoDao.getMemoById(widget.id),
+            builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final data = snapshot.data!;
+                  return Container(
+                      decoration: BoxDecoration(color: Color(data.color)),
+                      child: Text('Hello'),
+                  );
+                }
+                return const CircularProgressIndicator();
+            },
+          ),
+
+          Container(
+            width: 100,
+            decoration: BoxDecoration(color: Colors.red),
           )
         ],
       ),

@@ -34,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   addItem() async {
     await memoDao.insertMemo(
       Memo(
-          id: Random().nextInt(5000),
           desc: "Hello",
           date: DateTime.now().millisecondsSinceEpoch,
           color: 0xffb2d5d4),

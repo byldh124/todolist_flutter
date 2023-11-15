@@ -85,7 +85,7 @@ class _$MemoDatabase extends MemoDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Memo` (`id` INTEGER NOT NULL, `desc` TEXT NOT NULL, `date` INTEGER NOT NULL, `color` INTEGER NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Memo` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `desc` TEXT NOT NULL, `date` INTEGER NOT NULL, `color` INTEGER NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -151,9 +151,9 @@ class _$MemoDao extends MemoDao {
 
   @override
   Future<List<Memo>> getAllMemos() async {
-    return _queryAdapter.queryList('SELECT * FROM Memo',
+    return _queryAdapter.queryList('SELECT * FROM Memo ORDER by date desc',
         mapper: (Map<String, Object?> row) => Memo(
-            id: row['id'] as int,
+            id: row['id'] as int?,
             desc: row['desc'] as String,
             date: row['date'] as int,
             color: row['color'] as int));
@@ -163,7 +163,7 @@ class _$MemoDao extends MemoDao {
   Stream<Memo?> getMemoById(int id) {
     return _queryAdapter.queryStream('SELECT * FROM Memo WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Memo(
-            id: row['id'] as int,
+            id: row['id'] as int?,
             desc: row['desc'] as String,
             date: row['date'] as int,
             color: row['color'] as int),

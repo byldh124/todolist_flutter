@@ -2,14 +2,13 @@ import 'package:floor/floor.dart';
 
 @entity
 class Memo {
-  @primaryKey
-  final int id;
+  @PrimaryKey(autoGenerate: true)
+  final int? id;
   final String desc;
   final int date;
   final int color;
 
-  Memo({
-    required this.id,
+  Memo({ this.id,
     required this.desc,
     required this.date,
     required this.color,

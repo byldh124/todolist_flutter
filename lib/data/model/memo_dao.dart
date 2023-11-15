@@ -8,7 +8,7 @@ abstract class MemoDao {
   @insert
   Future<void> insertMemo(Memo memo);
 
-  @Query('SELECT * FROM Memo')
+  @Query('SELECT * FROM Memo ORDER by date desc')
   Future<List<Memo>> getAllMemos();
 
   @update

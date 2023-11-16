@@ -12,10 +12,10 @@ abstract class MemoDao {
   Future<List<Memo>> getAllMemos();
 
   @update
-  Future<void> updateTask(Memo memo);
+  Future<void> updateMemo(Memo memo);
 
   @Query('SELECT * FROM Memo WHERE id = :id')
-  Stream<Memo?> getMemoById(int id);
+  Future<Memo?> getMemoById(int id);
 
   @delete
   Future<void> deleteMemo(Memo memo);

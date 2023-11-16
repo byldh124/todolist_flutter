@@ -103,7 +103,7 @@ class _$MemoDao extends MemoDao {
   _$MemoDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database, changeListener),
+  )   : _queryAdapter = QueryAdapter(database),
         _memoInsertionAdapter = InsertionAdapter(
             database,
             'Memo',
@@ -112,8 +112,7 @@ class _$MemoDao extends MemoDao {
                   'desc': item.desc,
                   'date': item.date,
                   'color': item.color
-                },
-            changeListener),
+                }),
         _memoUpdateAdapter = UpdateAdapter(
             database,
             'Memo',
@@ -123,8 +122,7 @@ class _$MemoDao extends MemoDao {
                   'desc': item.desc,
                   'date': item.date,
                   'color': item.color
-                },
-            changeListener),
+                }),
         _memoDeletionAdapter = DeletionAdapter(
             database,
             'Memo',
@@ -134,8 +132,7 @@ class _$MemoDao extends MemoDao {
                   'desc': item.desc,
                   'date': item.date,
                   'color': item.color
-                },
-            changeListener);
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -160,16 +157,14 @@ class _$MemoDao extends MemoDao {
   }
 
   @override
-  Stream<Memo?> getMemoById(int id) {
-    return _queryAdapter.queryStream('SELECT * FROM Memo WHERE id = ?1',
+  Future<Memo?> getMemoById(int id) async {
+    return _queryAdapter.query('SELECT * FROM Memo WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Memo(
             id: row['id'] as int?,
             desc: row['desc'] as String,
             date: row['date'] as int,
             color: row['color'] as int),
-        arguments: [id],
-        queryableName: 'Memo',
-        isView: false);
+        arguments: [id]);
   }
 
   @override
@@ -178,7 +173,7 @@ class _$MemoDao extends MemoDao {
   }
 
   @override
-  Future<void> updateTask(Memo memo) async {
+  Future<void> updateMemo(Memo memo) async {
     await _memoUpdateAdapter.update(memo, OnConflictStrategy.abort);
   }
 

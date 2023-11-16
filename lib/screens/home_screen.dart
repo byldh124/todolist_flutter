@@ -9,6 +9,8 @@ import 'package:todolist_flutter/screens/detail_screen.dart';
 import 'package:todolist_flutter/widget/memo_widget.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -29,17 +31,23 @@ class _HomeScreenState extends State<HomeScreen> {
         .databaseBuilder(Constants.databaseName)
         .build();
     memoDao = database.memoDao;
+    getMemoList();
+  }
+
+  void getMemoList() async {
     memoList = await memoDao.getAllMemos();
     setState(() {});
   }
 
-  addItem() {
+  void addItem() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DetailScreen(memoDao: memoDao, id: -1),
       ),
-    );
+    ).then((value) {
+      getMemoList();
+    });
   }
 
   @override
@@ -66,17 +74,16 @@ class _HomeScreenState extends State<HomeScreen> {
             vertical: 20,
             horizontal: 15,
           ),
-          child: Container(
-            child: ListView.builder(
-                itemBuilder: (context, index) {
-                  final memo = memoList[index];
-                  return MemoWidget(
-                    memoDao: memoDao,
-                    memo: memo,
-                  );
-                },
-                itemCount: memoList.length),
-          )),
+          child: ListView.builder(
+              itemBuilder: (context, index) {
+                final memo = memoList[index];
+                return MemoWidget(
+                  memoDao: memoDao,
+                  memo: memo,
+                  callback: getMemoList,
+                );
+              },
+              itemCount: memoList.length)),
     );
   }
 }

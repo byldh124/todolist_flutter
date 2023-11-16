@@ -1,36 +1,53 @@
+import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
-import 'package:todolist_flutter/data/db/memo_database.dart';
+import 'package:todolist_flutter/common/Constants.dart';
 import 'package:todolist_flutter/data/model/memo_dao.dart';
 import 'package:todolist_flutter/data/model/memo_entity.dart';
 
-import '../common/Constants.dart';
-
 class DetailScreen extends StatefulWidget {
-  MemoDao memoDao;
-  int id = -1;
+  final MemoDao memoDao;
+  final int id;
 
-  DetailScreen({super.key, required this.memoDao, required this.id});
+  const DetailScreen({super.key, required this.memoDao, required this.id});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  late Memo memo;
-
+  late Memo memo = Memo(desc: "", date: 0, color: MyColor.yellow);
   bool doneSave = false;
 
   @override
   void initState() {
     super.initState();
-    //TODO id = -1인 경우는 신규 입력으로 판단하여 floor에서 데이터를 가져오지 말것
-    print("DetailScreen initState");
+    if (widget.id != -1) {
+      getMemo();
+    }
   }
 
-  saveMemo() async {
+  void getMemo() async {
+    memo = await widget.memoDao.getMemoById(widget.id) ??
+        Memo(desc: "", date: 0, color: MyColor.yellow);
+    setState(() {});
+  }
+
+  void saveMemo() async {
     memo.date = DateTime.now().millisecondsSinceEpoch;
     await widget.memoDao.insertMemo(memo);
     Navigator.pop(context);
+  }
+
+  void updateMemo() async {
+    memo.date = DateTime.now().millisecondsSinceEpoch;
+    await widget.memoDao.updateMemo(memo);
+    Navigator.pop(context);
+  }
+
+  void changeColor(int color) {
+    setState(() {
+      memo.color = color;
+    });
   }
 
   @override
@@ -41,13 +58,14 @@ class _DetailScreenState extends State<DetailScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.red,
         centerTitle: false,
+        elevation: 1,
         title: Text(
           '메모',
           style: Theme.of(context).textTheme.displayMedium,
         ),
         actions: [
           GestureDetector(
-            onTap: saveMemo,
+            onTap: memo.id != null ? updateMemo : saveMemo ,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 10,
@@ -65,26 +83,90 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
       body: Column(
         children: [
-          StreamBuilder(
-            
-            stream: widget.memoDao.getMemoById(widget.id),
-            builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final data = snapshot.data!;
-                  return Container(
-                      decoration: BoxDecoration(color: Color(data.color)),
-                      child: Text('Hello'),
-                  );
-                }
-                return const CircularProgressIndicator();
-            },
+          Flexible(
+            fit: FlexFit.tight,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(color: Color(memo.color)),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: TextField(
+                  onChanged: (text) {
+                    memo.desc = text;
+                  },
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  controller: TextEditingController(text: memo.desc),
+                  decoration: const InputDecoration(border: InputBorder.none),
+                ),
+              ),
+            ),
           ),
-
           Container(
-            width: 100,
-            decoration: BoxDecoration(color: Colors.red),
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            width: double.infinity,
+            height: 90,
+            decoration: BoxDecoration(color: Colors.white),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ColorBox(
+                  color: MyColor.yellow,
+                  callback: (color) {
+                    changeColor(color);
+                  },
+                ),
+                ColorBox(
+                  color: MyColor.violet,
+                  callback: (color) {
+                    changeColor(color);
+                  },
+                ),
+                ColorBox(
+                  color: MyColor.blue,
+                  callback: (color) {
+                    changeColor(color);
+                  },
+                ),
+                ColorBox(
+                  color: MyColor.green,
+                  callback: (color) {
+                    changeColor(color);
+                  },
+                ),
+                ColorBox(
+                  color: MyColor.pink,
+                  callback: (color) {
+                    changeColor(color);
+                  },
+                ),
+              ],
+            ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class ColorBox extends StatelessWidget {
+  final int color;
+  final void Function(int) callback;
+
+  const ColorBox({super.key, required this.color, required this.callback});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        callback(color);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 5),
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+            color: Color(color), borderRadius: BorderRadius.circular(15)),
       ),
     );
   }

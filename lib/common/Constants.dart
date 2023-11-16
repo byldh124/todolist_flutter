@@ -3,9 +3,9 @@ class Constants {
 }
 
 class MyColor {
-  static const int yellow = 0xfff1eaad;
-  static const int violet = 0xffe3a8ed;
-  static const int blue = 0xffa9d2f3;
-  static const int green = 0xffa8efe8;
-  static const int pink = 0xfff3a6c0;
+  static const int yellow = 0xfffaedcb;
+  static const int violet = 0xffdbcdf0;
+  static const int blue = 0xffc6def1;
+  static const int green = 0xffc9e4de;
+  static const int pink = 0xfff2c6de;
 }

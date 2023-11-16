@@ -16,6 +16,11 @@ class MemoWidget extends StatelessWidget {
     required this.callback,
   });
 
+  void deleteItem() async {
+    await memoDao.deleteMemo(memo);
+    callback();
+  }
+
   String getTimeFormat() {
     var dt = DateTime.fromMillisecondsSinceEpoch(memo.date);
     return "${dt.year} ${dt.month} ${dt.day}";
@@ -31,8 +36,32 @@ class MemoWidget extends StatelessWidget {
               builder: (context) =>
                   DetailScreen(memoDao: memoDao, id: memo.id ?? -1),
             )).then((value) {
-              callback();
+          callback();
         });
+      },
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('삭제'),
+            content: const Text('해당 메모를 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, 'Cancel');
+                },
+                child: const Text('아니요'),
+              ),
+              TextButton(
+                onPressed: (){
+                  Navigator.pop(context, 'ok');
+                  deleteItem();
+                },
+                child: const Text('네'),
+              ),
+            ],
+          ),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
